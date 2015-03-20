@@ -51,11 +51,6 @@ public class ShareIntentBuilderTest {
         assertThatMultipleTextsWorkAsExpected(intent, demoTexts);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testShareWithoutText() {
-        ShareIntentBuilder.newInstance().build();
-    }
-
     private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
         assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
