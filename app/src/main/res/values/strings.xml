@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ShareIntentBuilder</string>
+
+    <string name="button_label_share_text">Share text</string>
+</resources>
