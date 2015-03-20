@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(RobolectricTestRunner.class)
@@ -59,49 +60,28 @@ public class TextBuilderTest {
         assertThatMultipleTextsWorkAsExpected(intent, demoTexts);
     }
 
+    @Test
+    public void testShareMultipleTextsAsListInputWithNullElement() {
+        String demoText = "uno";
+        String[] demoTexts = { "one", null, "three" };
+
+        TextBuilder textBuilder = ShareIntentBuilder.newInstance().text(demoText);
+        try {
+            textBuilder.text(Arrays.asList(demoTexts));
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ignored) {}
+        Intent intent = textBuilder.build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareMultipleTextsWithNullArgument() {
         List<String> demoTexts = null;
         ShareIntentBuilder.newInstance().text(demoTexts);
-    }
-
-
-    @Test
-    public void testShareTextWithEmail() {
-        String demoText = "Help, I'm trapped in the basement!";
-        String[] to = { "alice@example.com", "bob@example.com", "charlie@example.com" };
-        String[] cc = { "joe@example.com", "john@example.com" };
-        String[] bcc = { "cketti@gmail.com" };
-        Intent intent = ShareIntentBuilder.newInstance()
-                .text(demoText)
-                .email(to[0]).to(to[1])
-                .cc(Arrays.asList(cc))
-                .bcc(bcc[0])
-                .to(to[2])
-                .build();
-
-        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
-        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
-        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
-        assertThat(intent.getStringArrayExtra(Intent.EXTRA_EMAIL)).isEqualTo(to);
-        assertThat(intent.getStringArrayExtra(Intent.EXTRA_CC)).isEqualTo(cc);
-        assertThat(intent.getStringArrayExtra(Intent.EXTRA_BCC)).isEqualTo(bcc);
-    }
-
-    @Test
-    public void testShareTextWithSubject() {
-        String demoText = "This goes into the email body";
-        String subject = "Hello World";
-        Intent intent = ShareIntentBuilder.newInstance()
-                .text(demoText)
-                .subject(subject)
-                .build();
-
-        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
-        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
-        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
-        assertThat(intent.getStringExtra(Intent.EXTRA_SUBJECT)).isEqualTo(subject);
     }
 
     private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {
