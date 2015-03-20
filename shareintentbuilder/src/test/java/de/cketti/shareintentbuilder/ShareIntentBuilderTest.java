@@ -130,6 +130,21 @@ public class ShareIntentBuilderTest {
         assertThat(intent.getStringArrayExtra(Intent.EXTRA_BCC)).isEqualTo(bcc);
     }
 
+    @Test
+    public void testShareTextWithSubject() {
+        String demoText = "This goes into the email body";
+        String subject = "Hello World";
+        Intent intent = ShareIntentBuilder.newInstance()
+                .text(demoText)
+                .subject(subject)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getStringExtra(Intent.EXTRA_SUBJECT)).isEqualTo(subject);
+    }
+
     private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
         assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);

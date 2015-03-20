@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
+    private String subject;
     private final List<String> recipientsTo = new ArrayList<>();
     private final List<String> recipientsCc = new ArrayList<>();
     private final List<String> recipientsBcc = new ArrayList<>();
@@ -18,6 +19,13 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     public static ShareIntentNoBuilder newInstance() {
         return new ShareIntentNoBuilder();
+    }
+
+    public T subject(@NonNull String subject) {
+        checkNotNull(subject);
+
+        this.subject = subject;
+        return getSelf();
     }
 
     public T email(@NonNull String email) {
@@ -79,6 +87,7 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
     public final Intent build() {
         Intent intent = buildTypeSpecificIntent();
 
+        addSubject(intent);
         addEmailRecipients(intent, Intent.EXTRA_EMAIL, recipientsTo);
         addEmailRecipients(intent, Intent.EXTRA_CC, recipientsCc);
         addEmailRecipients(intent, Intent.EXTRA_BCC, recipientsBcc);
@@ -86,6 +95,12 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
         return intent;
+    }
+
+    private void addSubject(Intent intent) {
+        if (subject != null) {
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        }
     }
 
     private void addEmailRecipients(Intent intent, String extraKey, List<String> to) {
