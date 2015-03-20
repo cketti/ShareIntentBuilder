@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
-public class StreamBuilder extends ShareIntentBuilder implements AcceptsExtraStream {
+public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements AcceptsExtraStream {
     private List<Uri> streams = new ArrayList<>();
     private String topLevelType;
     private String subType;
@@ -73,5 +73,10 @@ public class StreamBuilder extends ShareIntentBuilder implements AcceptsExtraStr
         } else if (!subType.equals(newSubType)) {
             subType = "*";
         }
+    }
+
+    @Override
+    protected StreamBuilder getSelf() {
+        return null;
     }
 }

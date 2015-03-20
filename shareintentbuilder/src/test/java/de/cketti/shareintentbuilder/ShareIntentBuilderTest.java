@@ -108,6 +108,28 @@ public class ShareIntentBuilderTest {
         assertThat(intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM)).isEqualTo(Arrays.asList(uris));
     }
 
+    @Test
+    public void testShareTextWithEmail() {
+        String demoText = "Help, I'm trapped in the basement!";
+        String[] to = { "alice@example.com", "bob@example.com", "charlie@example.com" };
+        String[] cc = { "joe@example.com", "john@example.com" };
+        String[] bcc = { "cketti@gmail.com" };
+        Intent intent = ShareIntentBuilder.newInstance()
+                .text(demoText)
+                .email(to[0]).to(to[1])
+                .cc(Arrays.asList(cc))
+                .bcc(bcc[0])
+                .to(to[2])
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getStringArrayExtra(Intent.EXTRA_EMAIL)).isEqualTo(to);
+        assertThat(intent.getStringArrayExtra(Intent.EXTRA_CC)).isEqualTo(cc);
+        assertThat(intent.getStringArrayExtra(Intent.EXTRA_BCC)).isEqualTo(bcc);
+    }
+
     private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
         assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);

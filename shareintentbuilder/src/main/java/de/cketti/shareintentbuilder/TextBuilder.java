@@ -8,7 +8,7 @@ import java.util.List;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-public class TextBuilder extends ShareIntentBuilder implements AcceptsExtraText {
+public class TextBuilder extends ShareIntentBuilder<TextBuilder> implements AcceptsExtraText {
     private final List<String> texts = new ArrayList<>();
 
     TextBuilder() {}
@@ -51,5 +51,10 @@ public class TextBuilder extends ShareIntentBuilder implements AcceptsExtraText 
     private void setMultipleText(Intent intent) {
         intent.setAction(Intent.ACTION_SEND_MULTIPLE);
         intent.putStringArrayListExtra(Intent.EXTRA_TEXT, new ArrayList<>(texts));
+    }
+
+    @Override
+    protected TextBuilder getSelf() {
+        return this;
     }
 }
