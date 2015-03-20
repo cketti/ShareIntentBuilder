@@ -3,6 +3,7 @@ package de.cketti.shareintentbuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -31,6 +32,13 @@ public class ShareIntentBuilderTest {
         assertThat(intent.getStringExtra(Intent.EXTRA_STREAM)).isNull();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareTextWithNullArgument() {
+        String demoText = null;
+        ShareIntentBuilder.newInstance().text(demoText);
+    }
+
     @Test
     public void testShareMultipleTexts() {
         String[] demoTexts = { "One text", "Another one" };
@@ -52,6 +60,13 @@ public class ShareIntentBuilderTest {
         assertThatMultipleTextsWorkAsExpected(intent, demoTexts);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareMultipleTextsWithNullArgument() {
+        List<String> demoTexts = null;
+        ShareIntentBuilder.newInstance().text(demoTexts);
+    }
+
     @Test
     public void testShareStream() {
         String type = "image/png";
@@ -64,6 +79,19 @@ public class ShareIntentBuilderTest {
         assertThat(intent.getType()).isEqualTo(type);
         assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isNull();
         assertThat(intent.getParcelableExtra(Intent.EXTRA_STREAM)).isEqualTo(uri);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareStreamWithFirstArgumentNull() {
+        ShareIntentBuilder.newInstance().stream(null, "text/plain");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareStreamWithSecondArgumentNull() {
+        Uri uri = Uri.parse("content://dummy/42");
+        ShareIntentBuilder.newInstance().stream(uri, null);
     }
 
     @Test

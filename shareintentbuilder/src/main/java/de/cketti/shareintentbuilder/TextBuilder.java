@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import android.content.Intent;
-
+import android.support.annotation.NonNull;
 
 public class TextBuilder extends ShareIntentBuilder implements AcceptsExtraText {
     private final List<String> texts = new ArrayList<>();
@@ -14,13 +14,17 @@ public class TextBuilder extends ShareIntentBuilder implements AcceptsExtraText 
     TextBuilder() {}
 
     @Override
-    public TextBuilder text(String text) {
+    public TextBuilder text(@NonNull String text) {
+        checkNotNull(text);
+
         texts.add(text);
         return this;
     }
 
     @Override
-    public TextBuilder text(Collection<String> texts) {
+    public TextBuilder text(@NonNull Collection<String> texts) {
+        checkNotNull(texts);
+
         this.texts.addAll(texts);
         return this;
     }

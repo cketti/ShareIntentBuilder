@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 
 public class StreamBuilder extends ShareIntentBuilder implements AcceptsExtraStream {
@@ -17,7 +18,10 @@ public class StreamBuilder extends ShareIntentBuilder implements AcceptsExtraStr
     StreamBuilder() {}
 
     @Override
-    public StreamBuilder stream(Uri stream, String type) {
+    public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
+        checkNotNull(stream);
+        checkNotNull(type);
+
         updateType(type);
         streams.add(stream);
         return this;

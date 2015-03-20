@@ -20,4 +20,10 @@ public abstract class ShareIntentBuilder {
     }
 
     protected abstract Intent buildTypeSpecificIntent();
+
+    protected void checkNotNull(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Argument may not be null");
+        }
+    }
 }
