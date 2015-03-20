@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 
 
 public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements AcceptsExtraStream {
-    private List<Uri> streams = new ArrayList<>();
+    private final List<Uri> streams = new ArrayList<>();
     private String topLevelType;
     private String subType;
 

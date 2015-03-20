@@ -45,10 +45,11 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     public T to(@NonNull List<String> emails) {
         checkNotNull(emails);
-
         for (String email : emails) {
-            to(email);
+            checkNotNull(email);
         }
+
+        recipientsTo.addAll(emails);
         return getSelf();
     }
 
@@ -61,10 +62,11 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     public T cc(@NonNull List<String> emails) {
         checkNotNull(emails);
-
         for (String email : emails) {
-            cc(email);
+            checkNotNull(email);
         }
+
+        recipientsCc.addAll(emails);
         return getSelf();
     }
 
@@ -77,10 +79,11 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     public T bcc(@NonNull List<String> emails) {
         checkNotNull(emails);
-
         for (String email : emails) {
-            bcc(email);
+            checkNotNull(email);
         }
+
+        recipientsBcc.addAll(emails);
         return getSelf();
     }
 

@@ -24,6 +24,9 @@ public class TextBuilder extends ShareIntentBuilder<TextBuilder> implements Acce
     @Override
     public TextBuilder text(@NonNull Collection<String> texts) {
         checkNotNull(texts);
+        for (String text : texts) {
+            checkNotNull(text);
+        }
 
         this.texts.addAll(texts);
         return this;
