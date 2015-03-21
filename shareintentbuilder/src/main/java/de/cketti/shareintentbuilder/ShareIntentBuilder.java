@@ -4,21 +4,29 @@ package de.cketti.shareintentbuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
 
 public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
+    public static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
+    public static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
+    private final Activity activity;
     private String subject;
     private final List<String> recipientsTo = new ArrayList<>();
     private final List<String> recipientsCc = new ArrayList<>();
     private final List<String> recipientsBcc = new ArrayList<>();
 
-    ShareIntentBuilder() {}
+    ShareIntentBuilder(Activity activity) {
+        this.activity = activity;
+    }
 
-    public static ShareIntentNoBuilder newInstance() {
-        return new ShareIntentNoBuilder();
+    public static ShareIntentNoBuilder from(@NonNull Activity activity) {
+        checkNotNull(activity);
+
+        return new ShareIntentNoBuilder(activity);
     }
 
     public T subject(@NonNull String subject) {
@@ -89,6 +97,7 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     public final Intent build() {
         Intent intent = buildTypeSpecificIntent();
+        addCallingPackageAndActivity(intent);
 
         addSubject(intent);
         addEmailRecipients(intent, Intent.EXTRA_EMAIL, recipientsTo);
@@ -98,6 +107,11 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
         return intent;
+    }
+
+    private void addCallingPackageAndActivity(Intent intent) {
+        intent.putExtra(EXTRA_CALLING_PACKAGE, activity.getPackageName());
+        intent.putExtra(EXTRA_CALLING_ACTIVITY, activity.getComponentName());
     }
 
     private void addSubject(Intent intent) {
@@ -116,7 +130,7 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
 
     protected abstract Intent buildTypeSpecificIntent();
 
-    protected void checkNotNull(Object obj) {
+    protected static void checkNotNull(Object obj) {
         if (obj == null) {
             throw new IllegalArgumentException("Argument may not be null");
         }

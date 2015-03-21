@@ -14,13 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(RobolectricTestRunner.class)
-public class StreamBuilderTest {
+public class StreamBuilderTest extends DummyActivityBaseTest {
 
     @Test
     public void testShareStream() {
         String type = "image/png";
         Uri uri = Uri.parse("content://dummy/42");
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .stream(uri, type)
                 .build();
 
@@ -33,20 +33,20 @@ public class StreamBuilderTest {
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareStreamWithFirstArgumentNull() {
-        ShareIntentBuilder.newInstance().stream(null, "text/plain");
+        ShareIntentBuilder.from(activity).stream(null, "text/plain");
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareStreamWithSecondArgumentNull() {
         Uri uri = Uri.parse("content://dummy/42");
-        ShareIntentBuilder.newInstance().stream(uri, null);
+        ShareIntentBuilder.from(activity).stream(uri, null);
     }
 
     @Test
     public void testShareMultipleStreams() {
         Uri[] uris = { Uri.parse("content://dummy/42"), Uri.parse("content://dummy/23")};
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .stream(uris[0], "image/png")
                 .stream(uris[1], "image/jpeg")
                 .build();

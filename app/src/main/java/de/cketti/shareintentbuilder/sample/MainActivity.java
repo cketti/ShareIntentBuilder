@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void shareText() {
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(this)
                 .text("Just sharing some text")
                 .build();
 

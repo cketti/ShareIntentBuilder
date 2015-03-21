@@ -16,13 +16,13 @@ import static org.junit.Assert.fail;
 
 
 @RunWith(RobolectricTestRunner.class)
-public class TextBuilderTest {
+public class TextBuilderTest extends DummyActivityBaseTest {
     private static final String TYPE_TEXT_PLAIN = "text/plain";
 
     @Test
     public void testShareText() {
         String demoText = "Simple text";
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .text(demoText)
                 .build();
 
@@ -36,13 +36,13 @@ public class TextBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithNullArgument() {
         String demoText = null;
-        ShareIntentBuilder.newInstance().text(demoText);
+        ShareIntentBuilder.from(activity).text(demoText);
     }
 
     @Test
     public void testShareMultipleTexts() {
         String[] demoTexts = { "One text", "Another one" };
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .text(demoTexts[0])
                 .text(demoTexts[1])
                 .build();
@@ -53,7 +53,7 @@ public class TextBuilderTest {
     @Test
     public void testShareMultipleTextsAsListInput() {
         String[] demoTexts = { "one", "two", "three" };
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .text(Arrays.asList(demoTexts))
                 .build();
 
@@ -65,7 +65,7 @@ public class TextBuilderTest {
         String demoText = "uno";
         String[] demoTexts = { "one", null, "three" };
 
-        TextBuilder textBuilder = ShareIntentBuilder.newInstance().text(demoText);
+        TextBuilder textBuilder = ShareIntentBuilder.from(activity).text(demoText);
         try {
             textBuilder.text(Arrays.asList(demoTexts));
             fail("Expected IllegalArgumentException");
@@ -81,7 +81,7 @@ public class TextBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShareMultipleTextsWithNullArgument() {
         List<String> demoTexts = null;
-        ShareIntentBuilder.newInstance().text(demoTexts);
+        ShareIntentBuilder.from(activity).text(demoTexts);
     }
 
     private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {

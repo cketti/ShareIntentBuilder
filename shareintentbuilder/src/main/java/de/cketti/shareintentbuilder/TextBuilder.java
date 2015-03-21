@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
 public class TextBuilder extends ShareIntentBuilder<TextBuilder> implements AcceptsExtraText {
     private final List<String> texts = new ArrayList<>();
 
-    TextBuilder() {}
+    TextBuilder(Activity activity) {
+        super(activity);
+    }
 
     @Override
     public TextBuilder text(@NonNull String text) {

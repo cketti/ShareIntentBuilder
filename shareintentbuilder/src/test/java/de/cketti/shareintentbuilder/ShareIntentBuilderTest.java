@@ -15,8 +15,10 @@ import static org.junit.Assert.fail;
 
 
 @RunWith(RobolectricTestRunner.class)
-public class ShareIntentBuilderTest {
+public class ShareIntentBuilderTest extends DummyActivityBaseTest {
     private static final String TYPE_TEXT_PLAIN = "text/plain";
+    private static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
+    private static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
     @Test
     public void testShareTextWithEmail() {
@@ -24,7 +26,7 @@ public class ShareIntentBuilderTest {
         String[] to = { "alice@example.com", "bob@example.com", "charlie@example.com" };
         String[] cc = { "joe@example.com", "john@example.com" };
         String[] bcc = { "cketti@gmail.com" };
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .text(demoText)
                 .email(to[0]).to(to[1])
                 .cc(Arrays.asList(cc))
@@ -44,14 +46,14 @@ public class ShareIntentBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithEmailNullArgument() {
         String email = null;
-        ShareIntentBuilder.newInstance().text("text").email(email);
+        ShareIntentBuilder.from(activity).text("text").email(email);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithEmailListNullArgument() {
         List<String> emails = null;
-        ShareIntentBuilder.newInstance().text("text").email(emails);
+        ShareIntentBuilder.from(activity).text("text").email(emails);
     }
 
     @Test
@@ -59,7 +61,7 @@ public class ShareIntentBuilderTest {
         String demoText = "boring.example.com";
         String email = "joe@example.com";
         String[] emails = { "alice@example.com", null, "charlie@example.com" };
-        TextBuilder textBuilder = ShareIntentBuilder.newInstance().text(demoText).email(email);
+        TextBuilder textBuilder = ShareIntentBuilder.from(activity).text(demoText).email(email);
         try {
             textBuilder.email(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
@@ -76,14 +78,14 @@ public class ShareIntentBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithCcNullArgument() {
         String email = null;
-        ShareIntentBuilder.newInstance().text("text").cc(email);
+        ShareIntentBuilder.from(activity).text("text").cc(email);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithCcListNullArgument() {
         List<String> emails = null;
-        ShareIntentBuilder.newInstance().text("text").cc(emails);
+        ShareIntentBuilder.from(activity).text("text").cc(emails);
     }
 
     @Test
@@ -91,7 +93,7 @@ public class ShareIntentBuilderTest {
         String demoText = "boring.example.com";
         String email = "joe@example.com";
         String[] emails = { "alice@example.com", null, "charlie@example.com" };
-        TextBuilder textBuilder = ShareIntentBuilder.newInstance().text(demoText).cc(email);
+        TextBuilder textBuilder = ShareIntentBuilder.from(activity).text(demoText).cc(email);
         try {
             textBuilder.cc(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
@@ -108,14 +110,14 @@ public class ShareIntentBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithBccNullArgument() {
         String email = null;
-        ShareIntentBuilder.newInstance().text("text").bcc(email);
+        ShareIntentBuilder.from(activity).text("text").bcc(email);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithBccListNullArgument() {
         List<String> emails = null;
-        ShareIntentBuilder.newInstance().text("text").bcc(emails);
+        ShareIntentBuilder.from(activity).text("text").bcc(emails);
     }
 
     @Test
@@ -123,7 +125,7 @@ public class ShareIntentBuilderTest {
         String demoText = "boring.example.com";
         String email = "joe@example.com";
         String[] emails = { "alice@example.com", null, "charlie@example.com" };
-        TextBuilder textBuilder = ShareIntentBuilder.newInstance().text(demoText).bcc(email);
+        TextBuilder textBuilder = ShareIntentBuilder.from(activity).text(demoText).bcc(email);
         try {
             textBuilder.bcc(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
@@ -140,7 +142,7 @@ public class ShareIntentBuilderTest {
     public void testShareTextWithSubject() {
         String demoText = "This goes into the email body";
         String subject = "Hello World";
-        Intent intent = ShareIntentBuilder.newInstance()
+        Intent intent = ShareIntentBuilder.from(activity)
                 .text(demoText)
                 .subject(subject)
                 .build();
@@ -154,6 +156,20 @@ public class ShareIntentBuilderTest {
     @SuppressWarnings("ConstantConditions")
     @Test(expected = IllegalArgumentException.class)
     public void testShareTextWithNullSubject() {
-        ShareIntentBuilder.newInstance().text("text").subject(null);
+        ShareIntentBuilder.from(activity).text("text").subject(null);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void staticFactoryMethodWithNullArgumentShouldThrowException() {
+        ShareIntentBuilder.from(null);
+    }
+
+    @Test
+    public void intentShouldContainExtraCallingPackageAndActivity() {
+        Intent intent = ShareIntentBuilder.from(activity).text("text").build();
+
+        assertThat(intent.getStringExtra(EXTRA_CALLING_PACKAGE)).isEqualTo(DEMO_PACKAGE_NAME);
+        assertThat(intent.getParcelableExtra(EXTRA_CALLING_ACTIVITY)).isEqualTo(DEMO_COMPONENT_NAME);
     }
 }

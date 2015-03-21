@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -15,7 +16,9 @@ public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements 
     private String topLevelType;
     private String subType;
 
-    StreamBuilder() {}
+    StreamBuilder(Activity activity) {
+        super(activity);
+    }
 
     @Override
     public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
