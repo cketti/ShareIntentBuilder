@@ -21,12 +21,33 @@ public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements 
     }
 
     @Override
+    public StreamBuilder stream(@NonNull Uri stream) {
+        checkNotNull(stream);
+
+        String type = getTypeViaContentResolver(stream);
+        addStream(stream, type);
+        return this;
+    }
+
+    private String getTypeViaContentResolver(Uri stream) {
+        String type = activity.getContentResolver().getType(stream);
+        if (type == null) {
+            throw new IllegalStateException("Content provider needs to provide a type");
+        }
+        return type;
+    }
+
+    private void addStream(Uri stream, String type) {
+        updateType(type);
+        streams.add(stream);
+    }
+
+    @Override
     public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
         checkNotNull(stream);
         checkNotNull(type);
 
-        updateType(type);
-        streams.add(stream);
+        addStream(stream, type);
         return this;
     }
 

@@ -13,7 +13,7 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
     public static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     public static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
-    private final Activity activity;
+    protected final Activity activity;
     private String subject;
     private final List<String> recipientsTo = new ArrayList<>();
     private final List<String> recipientsCc = new ArrayList<>();

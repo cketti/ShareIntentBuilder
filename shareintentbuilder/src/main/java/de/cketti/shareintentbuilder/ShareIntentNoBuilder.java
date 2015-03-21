@@ -26,6 +26,11 @@ public final class ShareIntentNoBuilder implements AcceptsExtraText, AcceptsExtr
     }
 
     @Override
+    public StreamBuilder stream(@NonNull Uri stream) {
+        return new StreamBuilder(activity).stream(stream);
+    }
+
+    @Override
     public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
         return new StreamBuilder(activity).stream(stream, type);
     }
