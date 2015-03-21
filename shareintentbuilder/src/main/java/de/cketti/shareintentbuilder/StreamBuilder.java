@@ -13,8 +13,7 @@ import android.support.annotation.NonNull;
 
 public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements AcceptsExtraStream {
     private final List<Uri> streams = new ArrayList<>();
-    private String topLevelType;
-    private String subType;
+    private MimeTypeAggregator mimeTypeAggregator = new MimeTypeAggregator();
 
     StreamBuilder(Activity activity) {
         super(activity);
@@ -38,7 +37,7 @@ public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements 
     }
 
     private void addStream(Uri stream, String type) {
-        updateType(type);
+        mimeTypeAggregator.add(type);
         streams.add(stream);
     }
 
@@ -54,7 +53,7 @@ public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements 
     @Override
     protected Intent buildTypeSpecificIntent() {
         Intent intent = new Intent();
-        intent.setType(buildType());
+        intent.setType(mimeTypeAggregator.getType());
 
         if (streams.size() > 1) {
             setMultipleStreams(intent);
@@ -73,30 +72,6 @@ public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements 
     private void setMultipleStreams(Intent intent) {
         intent.setAction(Intent.ACTION_SEND_MULTIPLE);
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, new ArrayList<>(streams));
-    }
-
-    private String buildType() {
-        return topLevelType + "/" + subType;
-    }
-
-    private void updateType(String type) {
-        if ("*".equals(topLevelType)) {
-            return;
-        }
-
-        String[] parts = type.split("/", 2);
-        String newTopLevelType = parts[0].toLowerCase(Locale.US);
-        String newSubType = parts[1].toLowerCase(Locale.US);
-
-        if (topLevelType == null) {
-            topLevelType = newTopLevelType;
-            subType = newSubType;
-        } else if (!topLevelType.equals(newTopLevelType)) {
-            topLevelType = "*";
-            subType = "*";
-        } else if (!subType.equals(newSubType)) {
-            subType = "*";
-        }
     }
 
     @Override
