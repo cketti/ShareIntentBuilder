@@ -76,7 +76,7 @@ public class StreamBuilderTest extends DummyActivityBaseTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testShareStreamWithAutomaticTypeResolutionAndContentProviderReturingNullForType() {
+    public void testShareStreamWithAutomaticTypeResolutionAndContentProviderReturningNullForType() {
         Uri uri = Uri.parse("content://dummy/42");
         setUpMockContentResolver(uri, null);
 

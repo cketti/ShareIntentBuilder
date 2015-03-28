@@ -50,8 +50,8 @@ public abstract class OptionalExtraBuilder<T extends OptionalExtraBuilder<T>> {
     }
 
     @NonNull
-    public T cc(@NonNull Collection<String> emailAddreses) {
-        builder.cc(emailAddreses);
+    public T cc(@NonNull Collection<String> emailAddresses) {
+        builder.cc(emailAddresses);
         return getSelf();
     }
 
@@ -62,8 +62,8 @@ public abstract class OptionalExtraBuilder<T extends OptionalExtraBuilder<T>> {
     }
 
     @NonNull
-    public T bcc(@NonNull Collection<String> emailAddreses) {
-        builder.bcc(emailAddreses);
+    public T bcc(@NonNull Collection<String> emailAddresses) {
+        builder.bcc(emailAddresses);
         return getSelf();
     }
 
