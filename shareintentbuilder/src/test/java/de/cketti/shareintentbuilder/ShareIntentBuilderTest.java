@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -20,10 +23,22 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(RobolectricTestRunner.class)
-public class ShareIntentBuilderTest extends DummyActivityBaseTest {
+public class ShareIntentBuilderTest {
+    private static final String DEMO_PACKAGE_NAME = "com.example.demo";
+    private static final ComponentName DEMO_COMPONENT_NAME =
+            new ComponentName(ShareIntentBuilderTest.DEMO_PACKAGE_NAME, "DummyActivity");
     private static final String TYPE_TEXT_PLAIN = "text/plain";
     private static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     private static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
+
+    protected Activity activity;
+
+    @Before
+    public void createActivity() {
+        activity = mock(Activity.class);
+        when(activity.getPackageName()).thenReturn(DEMO_PACKAGE_NAME);
+        when(activity.getComponentName()).thenReturn(DEMO_COMPONENT_NAME);
+    }
 
     @Test
     public void testShareTextWithEmail() {
