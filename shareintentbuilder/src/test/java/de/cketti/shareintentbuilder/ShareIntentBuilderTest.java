@@ -1,10 +1,13 @@
 package de.cketti.shareintentbuilder;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +15,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(RobolectricTestRunner.class)
@@ -171,5 +176,148 @@ public class ShareIntentBuilderTest extends DummyActivityBaseTest {
 
         assertThat(intent.getStringExtra(EXTRA_CALLING_PACKAGE)).isEqualTo(DEMO_PACKAGE_NAME);
         assertThat(intent.getParcelableExtra(EXTRA_CALLING_ACTIVITY)).isEqualTo(DEMO_COMPONENT_NAME);
+    }
+
+    @Test
+    public void testShareText() {
+        String demoText = "Simple text";
+        Intent intent = ShareIntentBuilder.from(activity)
+                .text(demoText)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getStringExtra(Intent.EXTRA_STREAM)).isNull();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareTextWithNullArgument() {
+        String demoText = null;
+        ShareIntentBuilder.from(activity).text(demoText);
+    }
+
+    @Test
+    public void testShareMultipleTexts() {
+        String[] demoTexts = { "One text", "Another one" };
+        Intent intent = ShareIntentBuilder.from(activity)
+                .text(demoTexts[0])
+                .text(demoTexts[1])
+                .build();
+
+        assertThatMultipleTextsWorkAsExpected(intent, demoTexts);
+    }
+
+    @Test
+    public void testShareMultipleTextsAsListInput() {
+        String[] demoTexts = { "one", "two", "three" };
+        Intent intent = ShareIntentBuilder.from(activity)
+                .text(Arrays.asList(demoTexts))
+                .build();
+
+        assertThatMultipleTextsWorkAsExpected(intent, demoTexts);
+    }
+
+    @Test
+    public void testShareMultipleTextsAsListInputWithNullElement() {
+        String demoText = "uno";
+        String[] demoTexts = { "one", null, "three" };
+
+        TextBuilder textBuilder = ShareIntentBuilder.from(activity).text(demoText);
+        try {
+            textBuilder.text(Arrays.asList(demoTexts));
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ignored) {}
+        Intent intent = textBuilder.build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareMultipleTextsWithNullArgument() {
+        List<String> demoTexts = null;
+        ShareIntentBuilder.from(activity).text(demoTexts);
+    }
+
+    @Test
+    public void testShareStream() {
+        String type = "image/png";
+        Uri uri = Uri.parse("content://dummy/42");
+        Intent intent = ShareIntentBuilder.from(activity)
+                .stream(uri, type)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(type);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isNull();
+        assertThat(intent.getParcelableExtra(Intent.EXTRA_STREAM)).isEqualTo(uri);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareStreamWithFirstArgumentNull() {
+        ShareIntentBuilder.from(activity).stream(null, "text/plain");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void testShareStreamWithSecondArgumentNull() {
+        Uri uri = Uri.parse("content://dummy/42");
+        ShareIntentBuilder.from(activity).stream(uri, null);
+    }
+
+    @Test
+    public void testShareMultipleStreams() {
+        Uri[] uris = { Uri.parse("content://dummy/42"), Uri.parse("content://dummy/23")};
+        Intent intent = ShareIntentBuilder.from(activity)
+                .stream(uris[0], "image/png")
+                .stream(uris[1], "image/jpeg")
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
+        assertThat(intent.getType()).isEqualTo("image/*");
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isNull();
+        assertThat(intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM)).isEqualTo(Arrays.asList(uris));
+    }
+
+    @Test
+    public void testStreamBuilderWithAutomaticTypeResolution() throws InterruptedException {
+        final String type = "image/png";
+        final Uri uri = Uri.parse("content://dummy/42");
+        setUpMockContentResolver(uri, type);
+
+        Intent intent = ShareIntentBuilder.from(activity)
+                .stream(uri)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(type);
+        assertThat(intent.getParcelableExtra(Intent.EXTRA_STREAM)).isEqualTo(uri);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testShareStreamWithAutomaticTypeResolutionAndContentProviderReturningNullForType() {
+        Uri uri = Uri.parse("content://dummy/42");
+        setUpMockContentResolver(uri, null);
+
+        ShareIntentBuilder.from(activity).stream(uri);
+    }
+
+    private void setUpMockContentResolver(Uri uri, String type) {
+        ContentResolver contentResolver = mock(ContentResolver.class);
+        when(contentResolver.getType(uri)).thenReturn(type);
+        when(activity.getContentResolver()).thenReturn(contentResolver);
+    }
+
+    private void assertThatMultipleTextsWorkAsExpected(Intent intent, String[] demoText) {
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
+        assertThat(intent.getType()).isEqualTo(TYPE_TEXT_PLAIN);
+        assertThat(intent.getStringArrayListExtra(Intent.EXTRA_TEXT).getClass()).isEqualTo(ArrayList.class);
+        assertThat(intent.getStringExtra(Intent.EXTRA_STREAM)).isNull();
+        assertThat(intent.getStringArrayListExtra(Intent.EXTRA_TEXT)).isEqualTo(Arrays.asList(demoText));
     }
 }
