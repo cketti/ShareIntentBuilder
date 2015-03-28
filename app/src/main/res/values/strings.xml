@@ -2,4 +2,6 @@
     <string name="app_name">ShareIntentBuilder</string>
 
     <string name="button_label_share_text">Share text</string>
+    <string name="share_dialog_title">Share…</string>
+    <string name="share_text">Sharing is caring!</string>
 </resources>

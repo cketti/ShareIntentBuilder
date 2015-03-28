@@ -29,9 +29,9 @@ public class MainActivity extends ActionBarActivity {
 
     private void shareText() {
         Intent intent = ShareIntentBuilder.from(this)
-                .text("Just sharing some text")
+                .text(getString(R.string.share_text))
                 .build();
 
-        startActivity(intent);
+        startActivity(Intent.createChooser(intent, getString(R.string.share_dialog_title)));
     }
 }
