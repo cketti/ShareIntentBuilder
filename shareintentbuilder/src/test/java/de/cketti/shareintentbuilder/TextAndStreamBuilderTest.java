@@ -16,41 +16,50 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(RobolectricTestRunner.class)
-public class StreamBuilderTest {
+public class TextAndStreamBuilderTest {
+    private static final String DEMO_TEXT = "Sharing is caring!";
     private static final String DEMO_TYPE = "image/png";
     private static final Uri DEMO_STREAM = Uri.parse("content://dummy/42");
 
     private final Intent dummyIntent = new Intent();
     private ShareIntentBuilder builder;
-    private StreamBuilder streamBuilder;
+    private TextAndStreamBuilder textAndStreamBuilder;
 
     @Before
-    public void createStreamBuilderWithMockedShareIntentBuilder() {
+    public void createTextAndStreamBuilderWithMockedShareIntentBuilder() {
         builder = mock(ShareIntentBuilder.class);
         when(builder.build()).thenReturn(dummyIntent);
 
-        streamBuilder = new StreamBuilder(builder);
+        textAndStreamBuilder = new TextAndStreamBuilder(builder);
     }
 
     @Test
     public void streamShouldCallThroughToShareIntentBuilder() {
-        StreamBuilder returnedBuilder = streamBuilder.stream(DEMO_STREAM);
+        TextAndStreamBuilder returnedBuilder = textAndStreamBuilder.stream(DEMO_STREAM);
 
         verify(builder).stream(DEMO_STREAM);
-        assertThat(returnedBuilder).isSameAs(streamBuilder);
+        assertThat(returnedBuilder).isSameAs(textAndStreamBuilder);
     }
 
     @Test
     public void streamWithTypeShouldCallThroughToShareIntentBuilder() {
-        StreamBuilder returnedBuilder = streamBuilder.stream(DEMO_STREAM, DEMO_TYPE);
+        TextAndStreamBuilder returnedBuilder = textAndStreamBuilder.stream(DEMO_STREAM, DEMO_TYPE);
 
         verify(builder).stream(DEMO_STREAM, DEMO_TYPE);
-        assertThat(returnedBuilder).isSameAs(streamBuilder);
+        assertThat(returnedBuilder).isSameAs(textAndStreamBuilder);
+    }
+
+    @Test
+    public void textShouldCallThroughToShareIntentBuilder() {
+        StreamBuilder returnedBuilder = textAndStreamBuilder.text(DEMO_TEXT);
+
+        verify(builder).text(DEMO_TEXT);
+        assertThat(returnedBuilder.builder).isSameAs(builder);
     }
 
     @Test
     public void buildShouldCallThroughToShareIntentBuilder() {
-        Intent intent = streamBuilder.build();
+        Intent intent = textAndStreamBuilder.build();
 
         verify(builder).build();
         assertThat(intent).isSameAs(dummyIntent);
@@ -58,8 +67,8 @@ public class StreamBuilderTest {
 
     @Test
     public void getSelfShouldReturnThis() {
-        StreamBuilder returnedSelf = streamBuilder.getSelf();
+        TextAndStreamBuilder returnedSelf = textAndStreamBuilder.getSelf();
 
-        assertThat(returnedSelf).isSameAs(streamBuilder);
+        assertThat(returnedSelf).isSameAs(textAndStreamBuilder);
     }
 }
