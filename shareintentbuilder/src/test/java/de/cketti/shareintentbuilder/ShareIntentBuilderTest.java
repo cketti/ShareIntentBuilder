@@ -316,10 +316,74 @@ public class ShareIntentBuilderTest {
 
     @Test(expected = IllegalStateException.class)
     public void testShareStreamWithAutomaticTypeResolutionAndContentProviderReturningNullForType() {
-        Uri uri = Uri.parse("content://dummy/42");
-        setUpMockContentResolver(uri, null);
+        Uri stream = Uri.parse("content://dummy/42");
+        setUpMockContentResolver(stream, null);
 
-        ShareIntentBuilder.from(activity).stream(uri);
+        ShareIntentBuilder.from(activity).stream(stream);
+    }
+
+    @Test
+    public void testShareTextAndStream() {
+        String demoText = "Share! Because data wants to be free";
+        Uri stream = Uri.parse("content://dummy/42");
+        String streamType = "image/png";
+        Intent intent = ShareIntentBuilder.from(activity)
+                .ignoreSpecification()
+                .text(demoText)
+                .stream(stream, streamType)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(streamType);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getParcelableExtra(Intent.EXTRA_STREAM)).isEqualTo(stream);
+    }
+
+    @Test
+    public void testShareTextAndMultipleStreams() {
+        String demoText = "Share! Because data wants to be free";
+        Uri streamOne = Uri.parse("content://dummy/42");
+        Uri streamTwo = Uri.parse("content://dummy/23");
+        String streamType = "image/png";
+        Intent intent = ShareIntentBuilder.from(activity)
+                .ignoreSpecification()
+                .text(demoText)
+                .stream(streamOne, streamType)
+                .stream(streamTwo, streamType)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
+        assertThat(intent.getType()).isEqualTo(streamType);
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM))
+                .isEqualTo(Arrays.asList(streamOne, streamTwo));
+    }
+
+    @Test
+    public void testShareTextAndMultipleStreamsWithTextSetInBetween() {
+        String recipient = "joe@example.com";
+        String demoText = "Share! Because data wants to be free";
+        Uri streamOne = Uri.parse("content://dummy/42");
+        Uri streamTwo = Uri.parse("content://dummy/23");
+        Uri streamThree = Uri.parse("content://dummy/-1");
+        String streamTypeOne = "image/png";
+        String streamTypeTwo = "image/jpeg";
+        String streamTypeThree = "application/octet-stream";
+        Intent intent = ShareIntentBuilder.from(activity)
+                .ignoreSpecification()
+                .to(recipient)
+                .stream(streamOne, streamTypeOne)
+                .stream(streamTwo, streamTypeTwo)
+                .text(demoText)
+                .stream(streamThree, streamTypeThree)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND_MULTIPLE);
+        assertThat(intent.getType()).isEqualTo("*/*");
+        assertThat(intent.getStringArrayExtra(Intent.EXTRA_EMAIL)).isEqualTo(new String[] { recipient });
+        assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
+        assertThat(intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM))
+                .isEqualTo(Arrays.asList(streamOne, streamTwo, streamThree));
     }
 
     private void setUpMockContentResolver(Uri uri, String type) {
