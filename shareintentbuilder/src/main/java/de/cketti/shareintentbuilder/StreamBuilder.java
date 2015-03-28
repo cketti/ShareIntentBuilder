@@ -2,80 +2,57 @@ package de.cketti.shareintentbuilder;
 
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
-public class StreamBuilder extends ShareIntentBuilder<StreamBuilder> implements AcceptsExtraStream {
-    private final List<Uri> streams = new ArrayList<>();
-    private MimeTypeAggregator mimeTypeAggregator = new MimeTypeAggregator();
+public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implements AcceptsExtraStream<StreamBuilder> {
 
-    StreamBuilder(Activity activity) {
-        super(activity);
+    StreamBuilder(ShareIntentBuilder builder) {
+        super(builder);
     }
 
-    @Override
+    @NonNull
     public StreamBuilder stream(@NonNull Uri stream) {
-        checkNotNull(stream);
-
-        String type = getTypeViaContentResolver(stream);
-        addStream(stream, type);
+        builder.stream(stream);
         return this;
     }
 
-    private String getTypeViaContentResolver(Uri stream) {
-        String type = activity.getContentResolver().getType(stream);
-        if (type == null) {
-            throw new IllegalStateException("Content provider needs to provide a type");
-        }
-        return type;
-    }
-
-    private void addStream(Uri stream, String type) {
-        mimeTypeAggregator.add(type);
-        streams.add(stream);
-    }
-
-    @Override
+    @NonNull
     public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
-        checkNotNull(stream);
-        checkNotNull(type);
-
-        addStream(stream, type);
+        builder.stream(stream, type);
         return this;
     }
 
-    @Override
-    protected Intent buildTypeSpecificIntent() {
+    @NonNull
+    public Intent build() {
         Intent intent = new Intent();
-        intent.setType(mimeTypeAggregator.getType());
+        intent.setType(builder.mimeTypeAggregator.getType());
 
-        if (streams.size() > 1) {
+        if (builder.streams.size() > 1) {
             setMultipleStreams(intent);
         } else {
             setSingleStream(intent);
         }
 
+        builder.addExtrasAndFlagsToIntent(intent);
         return intent;
     }
 
     private void setSingleStream(Intent intent) {
         intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_STREAM, streams.get(0));
+        intent.putExtra(Intent.EXTRA_STREAM, builder.streams.get(0));
     }
 
     private void setMultipleStreams(Intent intent) {
         intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, new ArrayList<>(streams));
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, new ArrayList<>(builder.streams));
     }
 
     @Override
     protected StreamBuilder getSelf() {
-        return null;
+        return this;
     }
 }

@@ -2,101 +2,134 @@ package de.cketti.shareintentbuilder;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
-public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
+public class ShareIntentBuilder {
     public static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     public static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
-    protected final Activity activity;
+    private final Activity activity;
+    final MimeTypeAggregator mimeTypeAggregator = new MimeTypeAggregator();
+    final List<String> texts = new ArrayList<>();
+    final List<Uri> streams = new ArrayList<>();
     private String subject;
     private final List<String> recipientsTo = new ArrayList<>();
     private final List<String> recipientsCc = new ArrayList<>();
     private final List<String> recipientsBcc = new ArrayList<>();
 
-    ShareIntentBuilder(Activity activity) {
+    private ShareIntentBuilder(Activity activity) {
         this.activity = activity;
     }
 
     public static ShareIntentNoBuilder from(@NonNull Activity activity) {
         checkNotNull(activity);
 
-        return new ShareIntentNoBuilder(activity);
+        ShareIntentBuilder builder = new ShareIntentBuilder(activity);
+        return new ShareIntentNoBuilder(builder);
     }
 
-    public T subject(@NonNull String subject) {
+
+    void text(@NonNull String text) {
+        checkNotNull(text);
+
+        texts.add(text);
+    }
+
+    void text(@NonNull Collection<String> texts) {
+        checkNotNull(texts);
+        for (String text : texts) {
+            checkNotNull(text);
+        }
+
+        this.texts.addAll(texts);
+    }
+
+    void stream(@NonNull Uri stream) {
+        checkNotNull(stream);
+
+        String type = getTypeViaContentResolver(stream);
+        addStream(stream, type);
+    }
+
+    void stream(@NonNull Uri stream, @NonNull String type) {
+        checkNotNull(stream);
+        checkNotNull(type);
+
+        addStream(stream, type);
+    }
+
+    private String getTypeViaContentResolver(Uri stream) {
+        String type = activity.getContentResolver().getType(stream);
+        if (type == null) {
+            throw new IllegalStateException("Content provider needs to provide a type");
+        }
+        return type;
+    }
+
+    private void addStream(Uri stream, String type) {
+        mimeTypeAggregator.add(type);
+        streams.add(stream);
+    }
+
+    void subject(@NonNull String subject) {
         checkNotNull(subject);
 
         this.subject = subject;
-        return getSelf();
     }
 
-    public T email(@NonNull String email) {
-        return to(email);
-    }
-
-    public T email(@NonNull List<String> emails) {
-        return to(emails);
-    }
-
-    public T to(@NonNull String email) {
+    void to(@NonNull String email) {
         checkNotNull(email);
 
         recipientsTo.add(email);
-        return getSelf();
     }
 
-    public T to(@NonNull List<String> emails) {
+    void to(@NonNull Collection<String> emails) {
         checkNotNull(emails);
         for (String email : emails) {
             checkNotNull(email);
         }
 
         recipientsTo.addAll(emails);
-        return getSelf();
     }
 
-    public T cc(@NonNull String email) {
+    void cc(@NonNull String email) {
         checkNotNull(email);
 
         recipientsCc.add(email);
-        return getSelf();
     }
 
-    public T cc(@NonNull List<String> emails) {
+    void cc(@NonNull Collection<String> emails) {
         checkNotNull(emails);
         for (String email : emails) {
             checkNotNull(email);
         }
 
         recipientsCc.addAll(emails);
-        return getSelf();
     }
 
-    public T bcc(@NonNull String email) {
+    void bcc(@NonNull String email) {
         checkNotNull(email);
 
         recipientsBcc.add(email);
-        return getSelf();
     }
 
-    public T bcc(@NonNull List<String> emails) {
+    void bcc(@NonNull Collection<String> emails) {
         checkNotNull(emails);
         for (String email : emails) {
             checkNotNull(email);
         }
 
         recipientsBcc.addAll(emails);
-        return getSelf();
     }
 
-    public final Intent build() {
-        Intent intent = buildTypeSpecificIntent();
+    void addExtrasAndFlagsToIntent(Intent intent) {
         addCallingPackageAndActivity(intent);
 
         addSubject(intent);
@@ -105,8 +138,6 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
         addEmailRecipients(intent, Intent.EXTRA_BCC, recipientsBcc);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-        return intent;
     }
 
     private void addCallingPackageAndActivity(Intent intent) {
@@ -128,13 +159,9 @@ public abstract class ShareIntentBuilder<T extends ShareIntentBuilder<T>> {
         intent.putExtra(extraKey, to.toArray(new String[to.size()]));
     }
 
-    protected abstract Intent buildTypeSpecificIntent();
-
     protected static void checkNotNull(Object obj) {
         if (obj == null) {
             throw new IllegalArgumentException("Argument may not be null");
         }
     }
-
-    protected abstract T getSelf();
 }

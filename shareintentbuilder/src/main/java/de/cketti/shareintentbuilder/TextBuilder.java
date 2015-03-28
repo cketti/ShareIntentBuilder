@@ -3,60 +3,51 @@ package de.cketti.shareintentbuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-public class TextBuilder extends ShareIntentBuilder<TextBuilder> implements AcceptsExtraText {
-    private final List<String> texts = new ArrayList<>();
+public class TextBuilder extends OptionalExtraBuilder<TextBuilder> implements AcceptsExtraText<TextBuilder> {
 
-    TextBuilder(Activity activity) {
-        super(activity);
+    TextBuilder(ShareIntentBuilder builder) {
+        super(builder);
     }
 
-    @Override
+    @NonNull
     public TextBuilder text(@NonNull String text) {
-        checkNotNull(text);
-
-        texts.add(text);
+        builder.text(text);
         return this;
     }
 
-    @Override
+    @NonNull
     public TextBuilder text(@NonNull Collection<String> texts) {
-        checkNotNull(texts);
-        for (String text : texts) {
-            checkNotNull(text);
-        }
-
-        this.texts.addAll(texts);
+        builder.text(texts);
         return this;
     }
 
-    @Override
-    protected Intent buildTypeSpecificIntent() {
+    @NonNull
+    public Intent build() {
         Intent intent = new Intent();
         intent.setType("text/plain");
 
-        if (texts.size() > 1) {
+        if (builder.texts.size() > 1) {
             setMultipleText(intent);
         } else {
             setSingleText(intent);
         }
 
+        builder.addExtrasAndFlagsToIntent(intent);
         return intent;
     }
 
     private void setSingleText(Intent intent) {
         intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT, texts.get(0));
+        intent.putExtra(Intent.EXTRA_TEXT, builder.texts.get(0));
     }
 
     private void setMultipleText(Intent intent) {
         intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-        intent.putStringArrayListExtra(Intent.EXTRA_TEXT, new ArrayList<>(texts));
+        intent.putStringArrayListExtra(Intent.EXTRA_TEXT, new ArrayList<>(builder.texts));
     }
 
     @Override

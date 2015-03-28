@@ -3,35 +3,39 @@ package de.cketti.shareintentbuilder;
 
 import java.util.Collection;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
-public final class ShareIntentNoBuilder implements AcceptsExtraText, AcceptsExtraStream {
-    private final Activity activity;
+public class ShareIntentNoBuilder extends OptionalExtraBuilder<ShareIntentNoBuilder>
+        implements AcceptsExtraText<TextBuilder>, AcceptsExtraStream<StreamBuilder> {
 
-    ShareIntentNoBuilder(Activity activity) {
-        this.activity = activity;
+    ShareIntentNoBuilder(ShareIntentBuilder builder) {
+        super(builder);
     }
 
-    @Override
+    @NonNull
     public TextBuilder text(@NonNull String text) {
-        return new TextBuilder(activity).text(text);
+        return new TextBuilder(builder).text(text);
     }
 
-    @Override
+    @NonNull
     public TextBuilder text(@NonNull Collection<String> texts) {
-        return new TextBuilder(activity).text(texts);
+        return new TextBuilder(builder).text(texts);
     }
 
-    @Override
+    @NonNull
     public StreamBuilder stream(@NonNull Uri stream) {
-        return new StreamBuilder(activity).stream(stream);
+        return new StreamBuilder(builder).stream(stream);
+    }
+
+    @NonNull
+    public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
+        return new StreamBuilder(builder).stream(stream, type);
     }
 
     @Override
-    public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
-        return new StreamBuilder(activity).stream(stream, type);
+    protected ShareIntentNoBuilder getSelf() {
+        return this;
     }
 }
