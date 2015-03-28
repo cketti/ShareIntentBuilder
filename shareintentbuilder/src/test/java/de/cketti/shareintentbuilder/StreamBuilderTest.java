@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE)
 public class StreamBuilderTest {
     private static final String DEMO_TYPE = "image/png";
     private static final Uri DEMO_STREAM = Uri.parse("content://dummy/42");

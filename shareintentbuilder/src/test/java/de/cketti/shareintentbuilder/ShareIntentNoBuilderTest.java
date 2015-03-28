@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE)
 public class ShareIntentNoBuilderTest {
     private static final String DEMO_TEXT = "Sharing is caring!";
     private static final List<String> DEMO_TEXTS = Arrays.asList(DEMO_TEXT, "Share, but do it right!");
