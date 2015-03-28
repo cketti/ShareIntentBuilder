@@ -17,6 +17,7 @@ public class ShareIntentBuilder {
 
     private final Activity activity;
     final MimeTypeAggregator mimeTypeAggregator = new MimeTypeAggregator();
+    private boolean ignoreSpecification = false;
     final List<String> texts = new ArrayList<>();
     final List<Uri> streams = new ArrayList<>();
     private String subject;
@@ -35,6 +36,9 @@ public class ShareIntentBuilder {
         return new ShareIntentNoBuilder(builder);
     }
 
+    void ignoreSpecification() {
+        ignoreSpecification = true;
+    }
 
     void text(@NonNull String text) {
         checkNotNull(text);
@@ -129,20 +133,91 @@ public class ShareIntentBuilder {
         recipientsBcc.addAll(emails);
     }
 
-    void addExtrasAndFlagsToIntent(Intent intent) {
-        addCallingPackageAndActivity(intent);
+    Intent build() {
+        Intent intent = new Intent();
+        if (texts.isEmpty()) {
+            buildShareIntentWithStream(intent);
+        } else if (streams.isEmpty()) {
+            buildShareIntentWithText(intent);
+        } else if (ignoreSpecification) {
+            buildShareIntentWithTextAndStream(intent);
+        } else {
+            throw new AssertionError("Text and stream supplied despite 'ignoreSpecification' being false");
+        }
 
+        addOptionalExtras(intent);
+        addCallingPackageAndActivity(intent);
+        addActivityFlags(intent);
+
+        return intent;
+    }
+
+    private void buildShareIntentWithText(Intent intent) {
+        intent.setType("text/plain");
+
+        boolean hasMoreThanOneText = texts.size() > 1;
+        if (hasMoreThanOneText) {
+            setMultipleText(intent);
+        } else {
+            setSingleText(intent);
+        }
+    }
+
+    private void setSingleText(Intent intent) {
+        intent.setAction(Intent.ACTION_SEND);
+        setSingleTextExtra(intent);
+    }
+
+    private void setSingleTextExtra(Intent intent) {
+        String text = texts.get(0);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+    }
+
+    private void setMultipleText(Intent intent) {
+        intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+        intent.putStringArrayListExtra(Intent.EXTRA_TEXT, new ArrayList<>(texts));
+    }
+
+    private void buildShareIntentWithStream(Intent intent) {
+        intent.setType(mimeTypeAggregator.getType());
+
+        boolean hasMoreThanOneStream = streams.size() > 1;
+        if (hasMoreThanOneStream) {
+            setMultipleStreams(intent);
+        } else {
+            setSingleStream(intent);
+        }
+    }
+
+    private void buildShareIntentWithTextAndStream(Intent intent) {
+        buildShareIntentWithStream(intent);
+        setSingleTextExtra(intent);
+    }
+
+    private void setSingleStream(Intent intent) {
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, streams.get(0));
+    }
+
+    private void setMultipleStreams(Intent intent) {
+        intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, new ArrayList<>(streams));
+    }
+
+    void addOptionalExtras(Intent intent) {
         addSubject(intent);
         addEmailRecipients(intent, Intent.EXTRA_EMAIL, recipientsTo);
         addEmailRecipients(intent, Intent.EXTRA_CC, recipientsCc);
         addEmailRecipients(intent, Intent.EXTRA_BCC, recipientsBcc);
-
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     }
 
     private void addCallingPackageAndActivity(Intent intent) {
         intent.putExtra(EXTRA_CALLING_PACKAGE, activity.getPackageName());
         intent.putExtra(EXTRA_CALLING_ACTIVITY, activity.getComponentName());
+    }
+
+    private void addActivityFlags(Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     }
 
     private void addSubject(Intent intent) {

@@ -14,6 +14,10 @@ public class ShareIntentNoBuilder extends OptionalExtraBuilder<ShareIntentNoBuil
         super(builder);
     }
 
+    public TextAndStreamNoBuilder ignoreSpecification() {
+        return new TextAndStreamNoBuilder(builder);
+    }
+
     @NonNull
     public TextBuilder text(@NonNull String text) {
         return new TextBuilder(builder).text(text);
