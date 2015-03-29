@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
+/**
+ * A {@link ShareIntentBuilder} wrapper that besides optional extras only allows adding streams.
+ */
 public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implements AcceptsExtraStream<StreamBuilder>,
         Buildable {
 
@@ -13,6 +16,9 @@ public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implement
         super(builder);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public StreamBuilder stream(@NonNull Uri stream) {
@@ -20,6 +26,9 @@ public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implement
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public StreamBuilder stream(@NonNull Uri stream, @NonNull String type) {
@@ -27,17 +36,26 @@ public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implement
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public Intent build() {
         return builder.build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void share() {
         builder.share();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void share(@NonNull CharSequence title) {
         builder.share(title);

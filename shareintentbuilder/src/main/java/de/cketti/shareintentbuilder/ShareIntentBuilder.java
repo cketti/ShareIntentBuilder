@@ -11,6 +11,25 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 
+/**
+ * A helper to create share intents, i.e. {@link Intent#ACTION_SEND} and {@link Intent#ACTION_SEND_MULTIPLE} intents.
+ *
+ * <p>This builder can only be used indirectly through a couple of wrapper classes. This allows for the type-safe
+ * generation of share intents that do not contain invalid combinations of intent extras.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * <code>
+ * ShareIntentBuilder.from(activity)
+ *         .text("Sharing is caring!")
+ *         .to("everyone@example.com")
+ *         .cc("carebear@example.com")
+ *         .share("Share this important message with…");
+ * </code>
+ * </pre>
+ *
+ * @see #from(Activity)
+ */
 public class ShareIntentBuilder {
     public static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     public static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
@@ -29,6 +48,15 @@ public class ShareIntentBuilder {
         this.activity = activity;
     }
 
+    /**
+     * Create the first in a series of type-safe builder wrappers to create a share intent or to launch a share using
+     * that intent.
+     *
+     * @param activity
+     *         the activity that will be used to launch the share
+     *
+     * @return a share intent builder wrapper
+     */
     public static ShareIntentNoBuilder from(@NonNull Activity activity) {
         checkNotNull(activity);
 
