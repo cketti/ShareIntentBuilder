@@ -34,6 +34,16 @@ public class TextBuilder extends OptionalExtraBuilder<TextBuilder> implements Ac
     }
 
     @Override
+    public void share() {
+        builder.share();
+    }
+
+    @Override
+    public void share(@NonNull CharSequence title) {
+        builder.share(title);
+    }
+
+    @Override
     protected TextBuilder getSelf() {
         return this;
     }

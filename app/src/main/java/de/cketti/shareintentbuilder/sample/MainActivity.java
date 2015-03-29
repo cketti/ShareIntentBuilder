@@ -1,9 +1,8 @@
 package de.cketti.shareintentbuilder.sample;
 
 
-import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -28,10 +27,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void shareText() {
-        Intent intent = ShareIntentBuilder.from(this)
+        ShareIntentBuilder.from(this)
                 .text(getString(R.string.share_text))
-                .build();
-
-        startActivity(Intent.createChooser(intent, getString(R.string.share_dialog_title)));
+                .share(getString(R.string.share_dialog_title));
     }
 }

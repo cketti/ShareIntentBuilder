@@ -41,6 +41,16 @@ public class TextAndStreamBuilder extends OptionalExtraBuilder<TextAndStreamBuil
     }
 
     @Override
+    public void share() {
+        builder.share();
+    }
+
+    @Override
+    public void share(@NonNull CharSequence title) {
+        builder.share(title);
+    }
+
+    @Override
     protected TextAndStreamBuilder getSelf() {
         return this;
     }

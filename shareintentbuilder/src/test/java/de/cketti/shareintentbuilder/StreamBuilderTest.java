@@ -59,6 +59,21 @@ public class StreamBuilderTest {
     }
 
     @Test
+    public void shareShouldCallThroughToShareIntentBuilder() {
+        streamBuilder.share();
+
+        verify(builder).share();
+    }
+
+    @Test
+    public void shareWithTitleShouldCallThroughToShareIntentBuilder() {
+        String title = "Share with…";
+        streamBuilder.share(title);
+
+        verify(builder).share(title);
+    }
+
+    @Test
     public void getSelfShouldReturnThis() {
         StreamBuilder returnedSelf = streamBuilder.getSelf();
 

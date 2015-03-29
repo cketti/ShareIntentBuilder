@@ -34,6 +34,16 @@ public class StreamBuilder extends OptionalExtraBuilder<StreamBuilder> implement
     }
 
     @Override
+    public void share() {
+        builder.share();
+    }
+
+    @Override
+    public void share(@NonNull CharSequence title) {
+        builder.share(title);
+    }
+
+    @Override
     protected StreamBuilder getSelf() {
         return this;
     }

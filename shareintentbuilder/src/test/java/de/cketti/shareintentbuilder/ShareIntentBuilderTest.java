@@ -14,12 +14,14 @@ import android.net.Uri;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -33,7 +35,7 @@ public class ShareIntentBuilderTest {
     private static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     private static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
-    protected Activity activity;
+    private Activity activity;
 
     @Before
     public void createActivity() {
@@ -87,7 +89,8 @@ public class ShareIntentBuilderTest {
         try {
             textBuilder.email(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
         Intent intent = textBuilder.build();
 
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
@@ -119,7 +122,8 @@ public class ShareIntentBuilderTest {
         try {
             textBuilder.cc(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
         Intent intent = textBuilder.build();
 
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
@@ -151,7 +155,8 @@ public class ShareIntentBuilderTest {
         try {
             textBuilder.bcc(Arrays.asList(emails));
             fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
         Intent intent = textBuilder.build();
 
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
@@ -245,7 +250,8 @@ public class ShareIntentBuilderTest {
         try {
             textBuilder.text(Arrays.asList(demoTexts));
             fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
         Intent intent = textBuilder.build();
 
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
@@ -289,7 +295,7 @@ public class ShareIntentBuilderTest {
 
     @Test
     public void testShareMultipleStreams() {
-        Uri[] uris = { Uri.parse("content://dummy/42"), Uri.parse("content://dummy/23")};
+        Uri[] uris = { Uri.parse("content://dummy/42"), Uri.parse("content://dummy/23") };
         Intent intent = ShareIntentBuilder.from(activity)
                 .stream(uris[0], "image/png")
                 .stream(uris[1], "image/jpeg")
@@ -386,6 +392,42 @@ public class ShareIntentBuilderTest {
         assertThat(intent.getStringExtra(Intent.EXTRA_TEXT)).isEqualTo(demoText);
         assertThat(intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM))
                 .isEqualTo(Arrays.asList(streamOne, streamTwo, streamThree));
+    }
+
+    @Test
+    public void shareShouldCreateChooserIntent() {
+        TextBuilder builder = ShareIntentBuilder.from(activity).text("Simple text");
+        Intent intent = builder.build();
+        builder.share();
+
+        ArgumentCaptor<Intent> startActivityCaptor = ArgumentCaptor.forClass(Intent.class);
+        verify(activity).startActivity(startActivityCaptor.capture());
+
+        Intent chooserIntent = startActivityCaptor.getValue();
+        assertThat(chooserIntent.getAction()).isEqualTo(Intent.ACTION_CHOOSER);
+        assertThat(chooserIntent.getParcelableExtra(Intent.EXTRA_INTENT)).isEqualTo(intent);
+    }
+
+    @Test
+    public void shareWithTitleShouldCreateChooserIntent() {
+        String shareDialogTitle = "I like sharing";
+        TextBuilder builder = ShareIntentBuilder.from(activity).text("Simple text");
+        Intent intent = builder.build();
+        builder.share(shareDialogTitle);
+
+        ArgumentCaptor<Intent> startActivityCaptor = ArgumentCaptor.forClass(Intent.class);
+        verify(activity).startActivity(startActivityCaptor.capture());
+
+        Intent chooserIntent = startActivityCaptor.getValue();
+        assertThat(chooserIntent.getAction()).isEqualTo(Intent.ACTION_CHOOSER);
+        assertThat(chooserIntent.getStringExtra(Intent.EXTRA_TITLE)).isEqualTo(shareDialogTitle);
+        assertThat(chooserIntent.getParcelableExtra(Intent.EXTRA_INTENT)).isEqualTo(intent);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(expected = IllegalArgumentException.class)
+    public void shareWithNullTitleShouldThrowException() {
+        ShareIntentBuilder.from(activity).text("dummy").share(null);
     }
 
     private void setUpMockContentResolver(Uri uri, String type) {

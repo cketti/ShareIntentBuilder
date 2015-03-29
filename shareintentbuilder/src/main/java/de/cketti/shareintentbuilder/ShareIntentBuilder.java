@@ -152,6 +152,22 @@ public class ShareIntentBuilder {
         return intent;
     }
 
+    void share() {
+        shareWithOptionalTitle(null);
+    }
+
+    void share(CharSequence title) {
+        checkNotNull(title);
+        shareWithOptionalTitle(title);
+    }
+
+    private void shareWithOptionalTitle(CharSequence title) {
+        Intent shareIntent = build();
+        Intent chooserIntent = Intent.createChooser(shareIntent, title);
+
+        activity.startActivity(chooserIntent);
+    }
+
     private void buildShareIntentWithText(Intent intent) {
         intent.setType("text/plain");
 

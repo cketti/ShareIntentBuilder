@@ -68,6 +68,20 @@ public class TextAndStreamBuilderTest {
     }
 
     @Test
+    public void shareShouldCallThroughToShareIntentBuilder() {
+        textAndStreamBuilder.share();
+
+        verify(builder).share();
+    }
+
+    @Test
+    public void shareWithTitleShouldCallThroughToShareIntentBuilder() {
+        textAndStreamBuilder.share(DEMO_TEXT);
+
+        verify(builder).share(DEMO_TEXT);
+    }
+
+    @Test
     public void getSelfShouldReturnThis() {
         TextAndStreamBuilder returnedSelf = textAndStreamBuilder.getSelf();
 

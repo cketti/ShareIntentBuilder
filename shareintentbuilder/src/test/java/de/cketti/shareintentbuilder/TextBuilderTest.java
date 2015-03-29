@@ -61,6 +61,20 @@ public class TextBuilderTest {
     }
 
     @Test
+    public void shareShouldCallThroughToShareIntentBuilder() {
+        textBuilder.share();
+
+        verify(builder).share();
+    }
+
+    @Test
+    public void shareWithTitleShouldCallThroughToShareIntentBuilder() {
+        textBuilder.share(DEMO_TEXT);
+
+        verify(builder).share(DEMO_TEXT);
+    }
+
+    @Test
     public void getSelfShouldReturnThis() {
         TextBuilder returnedSelf = textBuilder.getSelf();
 
