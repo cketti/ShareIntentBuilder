@@ -5,6 +5,7 @@ android {
     buildToolsVersion "22.0.0"
 
     defaultConfig {
+        versionName "0.0.1"
         minSdkVersion 15
     }
 
@@ -29,3 +30,26 @@ afterEvaluate {
     // Work around a bug in the Android plugin(?)
     tasks['assembleDebugUnitTest'].dependsOn(tasks['assembleDebug'])
 }
+
+project.ext {
+    pom = [
+            group: "de.cketti.share",
+            artifactId: "share-intent-builder",
+            name: "Share Intent Builder",
+            description: "An Android Library for the type-safe generation of Share Intents",
+            url: "https://github.com/cketti/ShareIntentBuilder",
+
+            scmUrl: "https://github.com/cketti/ShareIntentBuilder",
+            scmConnection: "scm:git@github.com:cketti/ShareIntentBuilder.git",
+            scmDevConnection: "scm:git@github.com:cketti/ShareIntentBuilder.git",
+
+            licenseName: "The Apache Software License, Version 2.0",
+            licenseUrl: "http://www.apache.org/licenses/LICENSE-2.0.txt",
+            licenseDist: "repo",
+
+            developerId: "cketti",
+            developerName: "cketti"
+    ]
+}
+
+apply from: '../android-mvn-push.gradle'
