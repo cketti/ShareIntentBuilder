@@ -26,11 +26,6 @@ dependencies {
     testCompile 'org.robolectric:robolectric:2.4'
 }
 
-afterEvaluate {
-    // Work around a bug in the Android plugin(?)
-    tasks['assembleDebugUnitTest'].dependsOn(tasks['assembleDebug'])
-}
-
 project.ext {
     pom = [
             group: "de.cketti.share",
