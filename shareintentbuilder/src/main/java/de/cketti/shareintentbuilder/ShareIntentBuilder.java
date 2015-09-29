@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -44,13 +45,13 @@ import android.support.annotation.NonNull;
  * </code>
  * </pre>
  *
- * @see #from(Activity)
+ * @see #from(Context)
  */
 public class ShareIntentBuilder {
     public static final String EXTRA_CALLING_PACKAGE = "android.support.v4.app.EXTRA_CALLING_PACKAGE";
     public static final String EXTRA_CALLING_ACTIVITY = "android.support.v4.app.EXTRA_CALLING_ACTIVITY";
 
-    private final Activity activity;
+    private final Context context;
     final MimeTypeAggregator mimeTypeAggregator = new MimeTypeAggregator();
     private boolean ignoreSpecification = false;
     final List<String> texts = new ArrayList<>();
@@ -60,23 +61,23 @@ public class ShareIntentBuilder {
     private final List<String> recipientsCc = new ArrayList<>();
     private final List<String> recipientsBcc = new ArrayList<>();
 
-    private ShareIntentBuilder(Activity activity) {
-        this.activity = activity;
+    private ShareIntentBuilder(Context context) {
+        this.context = context;
     }
 
     /**
      * Create the first in a series of type-safe builder wrappers to create a share intent or to launch a share using
      * that intent.
      *
-     * @param activity
-     *         the activity that will be used to launch the share
+     * @param context
+     *         the {@code Context} that will be used to launch the share
      *
      * @return a share intent builder wrapper
      */
-    public static ShareIntentNoBuilder from(@NonNull Activity activity) {
-        checkNotNull(activity);
+    public static ShareIntentNoBuilder from(@NonNull Context context) {
+        checkNotNull(context);
 
-        ShareIntentBuilder builder = new ShareIntentBuilder(activity);
+        ShareIntentBuilder builder = new ShareIntentBuilder(context);
         return new ShareIntentNoBuilder(builder);
     }
 
@@ -114,7 +115,7 @@ public class ShareIntentBuilder {
     }
 
     private String getTypeViaContentResolver(Uri stream) {
-        String type = activity.getContentResolver().getType(stream);
+        String type = context.getContentResolver().getType(stream);
         if (type == null) {
             throw new IllegalStateException("Content provider needs to provide a type");
         }
@@ -190,7 +191,8 @@ public class ShareIntentBuilder {
         }
 
         addOptionalExtras(intent);
-        addCallingPackageAndActivity(intent);
+        addCallingPackageExtra(intent);
+        addCallingActivityExtraIfAvailable(intent);
         addActivityFlags(intent);
 
         return intent;
@@ -209,7 +211,15 @@ public class ShareIntentBuilder {
         Intent shareIntent = build();
         Intent chooserIntent = Intent.createChooser(shareIntent, title);
 
-        activity.startActivity(chooserIntent);
+        startActivity(chooserIntent);
+    }
+
+    private void startActivity(Intent intent) {
+        if (!(context instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        context.startActivity(intent);
     }
 
     private void buildShareIntentWithText(Intent intent) {
@@ -271,9 +281,15 @@ public class ShareIntentBuilder {
         addEmailRecipients(intent, Intent.EXTRA_BCC, recipientsBcc);
     }
 
-    private void addCallingPackageAndActivity(Intent intent) {
-        intent.putExtra(EXTRA_CALLING_PACKAGE, activity.getPackageName());
-        intent.putExtra(EXTRA_CALLING_ACTIVITY, activity.getComponentName());
+    private void addCallingPackageExtra(Intent intent) {
+        intent.putExtra(EXTRA_CALLING_PACKAGE, context.getPackageName());
+    }
+
+    private void addCallingActivityExtraIfAvailable(Intent intent) {
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            intent.putExtra(EXTRA_CALLING_ACTIVITY, activity.getComponentName());
+        }
     }
 
     private void addActivityFlags(Intent intent) {
