@@ -102,6 +102,9 @@ public class ShareIntentBuilder {
 
     void stream(@NonNull Uri stream) {
         checkNotNull(stream);
+        if (!ignoreSpecification) {
+            checkContentScheme(stream);
+        }
 
         String type = getTypeViaContentResolver(stream);
         addStream(stream, type);
@@ -110,6 +113,9 @@ public class ShareIntentBuilder {
     void stream(@NonNull Uri stream, @NonNull String type) {
         checkNotNull(stream);
         checkNotNull(type);
+        if (!ignoreSpecification) {
+            checkContentScheme(stream);
+        }
 
         addStream(stream, type);
     }
@@ -308,6 +314,12 @@ public class ShareIntentBuilder {
         }
 
         intent.putExtra(extraKey, to.toArray(new String[to.size()]));
+    }
+
+    private static void checkContentScheme(@NonNull Uri uri) {
+        if (!"content".equals(uri.getScheme())) {
+            throw new IllegalArgumentException("Argument must be a content:// URI");
+        }
     }
 
     protected static void checkNotNull(Object obj) {

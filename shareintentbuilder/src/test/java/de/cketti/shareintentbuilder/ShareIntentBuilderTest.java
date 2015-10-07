@@ -346,6 +346,31 @@ public class ShareIntentBuilderTest {
         ShareIntentBuilder.from(activity).stream(stream);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shareStreamWithFileUriShouldThrowException() {
+        ShareIntentBuilder.from(activity).stream(Uri.parse("file:///dummy.txt"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shareStreamWithFileUriAndTypeShouldThrowException() {
+        ShareIntentBuilder.from(activity).stream(Uri.parse("file:///dummy.txt"), "application/octet-stream");
+    }
+
+    @Test
+    public void testShareStreamWithFileUriAndIgnoreSpecification() {
+        Uri stream = Uri.parse("file:///42");
+        String streamType = "image/png";
+
+        Intent intent = ShareIntentBuilder.from(activity)
+                .ignoreSpecification()
+                .stream(stream, streamType)
+                .build();
+
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_SEND);
+        assertThat(intent.getType()).isEqualTo(streamType);
+        assertThat(intent.getParcelableExtra(Intent.EXTRA_STREAM)).isEqualTo(stream);
+    }
+
     @Test
     public void testShareTextAndStream() {
         String demoText = "Share! Because data wants to be free";
