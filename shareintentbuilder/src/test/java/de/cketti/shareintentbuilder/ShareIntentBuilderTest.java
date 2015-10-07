@@ -24,6 +24,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -469,6 +470,24 @@ public class ShareIntentBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void shareWithNullTitleShouldThrowException() {
         ShareIntentBuilder.from(activity).text("dummy").share(null);
+    }
+
+    @Test
+    public void shareFromContextShouldAddNewTaskFlag() throws Exception {
+        Context context = createFakeContext();
+
+        ShareIntentBuilder.from(context).text("dummy").share();
+
+        ArgumentCaptor<Intent> argumentCaptor = ArgumentCaptor.forClass(Intent.class);
+        verify(context).startActivity(argumentCaptor.capture());
+        assertThat(argumentCaptor.getValue().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK)
+                .isEqualTo(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    private Context createFakeContext() {
+        Context context = mock(Context.class);
+        when(context.getPackageName()).thenReturn(DEMO_PACKAGE_NAME);
+        return context;
     }
 
     private void setUpMockContentResolver(Uri uri, String type) {
