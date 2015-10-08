@@ -61,7 +61,7 @@ The easiest way to add the library to your project is via Gradle. Add the follow
 
 ```groovy
 dependencies {
-    compile 'de.cketti.share:share-intent-builder:0.0.1'
+    compile 'de.cketti.share:share-intent-builder:0.0.2'
 }
 ```
 
