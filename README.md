@@ -1,4 +1,4 @@
-# Share Intent Builder
+# Share Intent Builder [![](https://jitpack.io/v/kibotu/ShareIntentBuilder.svg)](https://jitpack.io/#kibotu/ShareIntentBuilder)
 
 [![Build status](https://api.travis-ci.org/cketti/ShareIntentBuilder.svg)](https://travis-ci.org/cketti/ShareIntentBuilder)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.cketti.share/share-intent-builder/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.cketti.share/share-intent-builder)
